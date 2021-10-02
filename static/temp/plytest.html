@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script type="text/javascript">
+
+    function vidplay() {
+       var video = document.getElementById("Video1");
+       var button = document.getElementById("play");
+       if (video.paused) {
+          video.play();
+          button.textContent = "||";
+       } else {
+          video.pause();
+          button.textContent = ">";
+       }
+    }
+
+    function restart() {
+        var video = document.getElementById("Video1");
+        video.currentTime = 0;
+    }
+
+    function skip(value) {
+        var video = document.getElementById("Video1");
+        video.currentTime += value;
+    }
+
+</script>
+<script>
+
+</script>
+
+<body>
+<div style="text-align:center">
+<video id="Video1" width="420">
+//  Replace these with your own video files.
+      <source src="output.mp4" type="video/mp4">
+    HTML5 Video is required for this example.
+     <a href="demo.mp4">Download the video</a> file.
+</video>
+
+<div id="buttonbar" >
+    <button id="restart" onclick="restart();">Restart</button>
+    <button id="rew" onclick="skip(-5)">&lt;&lt;</button>
+    <button id="play" onclick="vidplay()">&gt;</button>
+    <button id="fastFwd" onclick="skip(5)">&gt;&gt;</button>
+    <button id='1x'>
+  1x
+</button>
+<button id='speed'>
+  1.5x
+</button>
+<button id='2x'>
+  2x
+</button>
+</div></div>
+</body>
+</html>
