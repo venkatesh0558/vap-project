@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VAP Services</title>
+</head>
+<body>
+<div align="center">
+    <h1 style="color:#36b58d;">Search Controls (Object Identification)</h1>
+<img src="{{ res_image }}" alt="Image" style="width:620px;height:450px;">
+<table border = 1>
+    {% for key, value in result.items() %}
+
+    <tr>
+       <th> {{ key }} </th>
+       <td> {{ value }} </td>
+    </tr>
+
+    {% endfor %}
+ </table></div>
+</body>
+</html>

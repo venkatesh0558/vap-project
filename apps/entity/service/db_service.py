@@ -6,10 +6,17 @@ import bcrypt
 db = client.VAP # create local UserEntity database on the fly
 
 def entity_insert(data=None):
+    res_data = db.entity.find({'Organization_Name': data['Organization_Name']}, {"_id": 0}).count() > 0
+    print(res_data)
+    if res_data == False:
+        db.entity.insert(data)
+        print("done")
+        return "Entity registered"
+    elif res_data == True:
+        return "Entity already exist"
+    else:
+        return "Not allowed"
 
-    print(data)
-    db.entity.insert(data)
-    return "Entity registered"
 
 def entity_get():
 

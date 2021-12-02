@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VAP Services</title>
+</head>
+<body>
+<form action="/imgprocess" method="post" enctype="multipart/form-data">
+  <input type="file" id="myFile" name="searchfilename" required>
+  <label for="label">Choose a Label:</label>
+  <select name="label" id="label" required>
+    <option value="total">Total Detection</option>
+    <option value="person">Person</option>
+    <option value="car">Car</option>
+    <option value="bus">Bus</option>
+    <option value="knife">Knife</option>
+    <option value="bicycle">Bicycle</option>
+  </select>
+  <br><br>
+  <input type="submit" value="Submit">
+</form>
+</body>
+</html>

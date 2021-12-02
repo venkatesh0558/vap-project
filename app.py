@@ -8,8 +8,11 @@ import json
 import casesDB
 import media_meatadata
 from videodb import video_metadata_insert
+from search_object_inference import *
+from test import *
+RESULT_FOLDER = os.path.join('static', 'result')
 app = Flask(__name__)
-
+app.config['UPLOAD_FOLDER'] = RESULT_FOLDER
 def authorize(f):
     @wraps(f)
 
@@ -293,42 +296,6 @@ def Pemissionsuser():
                 return "something wrong please try again"
         else:
             return "Please give required data"
-# @app.route('/per/list', methods=['GET'])
-# def userget(current_user,clientdata, *args, **kwargs):
-#     if request.method == 'GET':
-#         print(clientdata)
-#         print(current_user)
-#         res=mongo_rp.user_get()
-#         # print(json.dumps(res))
-#         # res_json=json.loads(res)
-#         res_data={"respond":res}
-#         return jsonify(res_data)
-# @app.route('/per/update', methods=['PUT'])
-# def userupdatedata(urrent_user,clientdata, *args, **kwargs):
-#
-#     if request.method == 'PUT':
-#         user_data = request.json
-#         names = ('Email_Address', 'updatedata')
-#         re_dataset = set(names).issubset(user_data)
-#         print(re_dataset)
-#         try:
-#             if re_dataset is True:
-#                 res = mongo_rp.user_update(data=user_data)
-#                 print(res)
-#                 return res
-#             else:
-#                 return "Something missing your user update fields"
-#         except:
-#             return "something wrong please try again"
-# @app.route('/per/delete', methods=['DELETE'])
-# def userdeletedata(urrent_user,clientdata, *args, **kwargs):
-#     if request.method == 'DELETE':
-#         entity_data=request.json
-#         print(entity_data)
-#         res=mongo_rp.user_delete(data=entity_data)
-#         print(res)
-#         return res
-#
 
 @app.route('/uploadvideo', methods=['GET','POST'])
 # @authorize
@@ -346,7 +313,7 @@ def upload():
         timestamp=datetime.datetime.now()
         # samplefile = 'sample_videos/file_example_OGG_480_1_7mg.ogg'
         res_meatadata = media_meatadata.metadatainfo(str(file_name))
-        current_user="Rao"
+        current_user=request.form['UserName']
         data={
             "UserName":current_user,
             "Video_ID":current_user+'_1',
@@ -356,9 +323,10 @@ def upload():
             "Video_Metadata":res_meatadata
         }
         # print(res_meatadata[2])
+        # res_data=json.dumps(data)
         res=video_metadata_insert(data)
         print(res)
-        return "Video MetaData Stored into DB"
+        return json.dumps(data,default=str)
 @app.route('/video/active', methods=['GET'])
 @authorize
 def useractive1(urrent_user,clientdata, *args, **kwargs):
@@ -415,6 +383,173 @@ def Rew_FF(urrent_user,clientdata, *args, **kwargs):
         res_data = {"respond": False}
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + "res" + b'\r\n\r\n')
+@app.route('/searchobject', methods=['GET','POST'])
+def searchobject():
+    if request.method == 'GET':
+        return render_template("search_object.html")
+
+    elif request.method == 'POST':
+        res=request.form
+        res_label=res.get('label')
+        res_with=res.get('with')
+        if res_with == "data":
+            h_w_l_r={}
+            h_w_l_r['height']=int(res.get('height'))
+            h_w_l_r['width']=int(res.get('width'))
+            h_w_l_r['top']=int(res.get('top'))
+            h_w_l_r['left']=int(res.get('left'))
+            print(res_label)
+            print(type(h_w_l_r))
+            f = request.files['searchfilename']
+            # print(f)
+            # print(request.content_length)
+            file_name = "copy_of_" + f.filename
+            # print(file_name.split())
+            f.save(file_name)
+            res_search=search_object_api(file_name)
+            # print(res_search)
+            search_label_data=[]
+            for i in res_search:
+                if i['label'] ==res_label:
+                    search_label_data.append(i)
+                else:
+                    pass
+            label=res_label
+            res_final=get_search_data(search_label_data,h_w_l_r,label)
+            print(res_final)
+            return {"Respond":res_final}
+        elif res_with == "None":
+
+            f = request.files['searchfilename']
+            # print(f)
+            # print(request.content_length)
+            file_name = "copy_of_" + f.filename
+            # print(file_name.split())
+            f.save(file_name)
+            res_search=search_object_api(file_name)
+            # print(res_search)
+            search_label_data=[]
+            for i in res_search:
+                if i['label'] ==res_label:
+                    search_label_data.append(i)
+                else:
+                    pass
+            return {"Respond":search_label_data}
+
+@app.route('/imgprocess', methods=['GET','POST'])
+def imgprocess():
+    if request.method == 'GET':
+        return render_template("imgprocess_home.html")
+
+    elif request.method == 'POST':
+        res=request.form
+        res_label=res.get('label')
+        print(res_label)
+        f = request.files['searchfilename']
+        file_name = "copy_of_" + f.filename
+        f.save(file_name)
+        res_search=search_object_api(file_name)
+        print(res_search)
+        if res_label == 'total':
+            # search_label_data=[]
+            # for i in res_search:
+            #     if i['label'] ==res_label:
+            #         search_label_data.append(i)
+            #     else:
+            #         pass
+            path = file_name
+            image = cv2.imread(path)
+            for i in res_search:
+                print(i)
+                start_point = (i['left'], int(i['top']))  # top,left
+                end_point = (i['width'] + i['left'], i['height'] + int(i['top']))
+                color = (255, 0, 0)
+                thickness = 2
+                cv2.rectangle(image, start_point, end_point, color, thickness)
+            cv2.imwrite('./static/result/out.jpg', image)
+            full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'out.jpg')
+            from collections import Counter
+            res = Counter(tok['label'] for tok in res_search)
+            return render_template("imgprocess_index.html",res_image=full_filename,result=dict(res))
+        else:
+            search_label_data=[]
+            for i in res_search:
+                if i['label'] ==res_label:
+                    search_label_data.append(i)
+                else:
+                    pass
+            path = file_name
+            image = cv2.imread(path)
+            for i in search_label_data:
+                print(i)
+                start_point = (i['left'], int(i['top']))  # top,left
+                end_point = (i['width'] + i['left'], i['height'] + int(i['top']))
+                color = (255, 0, 0)
+                thickness = 2
+                cv2.rectangle(image, start_point, end_point, color, thickness)
+            cv2.imwrite('./static/result/out.jpg', image)
+            full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'out.jpg')
+            from collections import Counter
+            res = Counter(tok['label'] for tok in search_label_data)
+            result=dict(res)
+            return render_template("imgprocess_index.html",res_image=full_filename,result=result)
+@app.route('/vdoprocess', methods=['GET','POST'])
+def vdoprocess():
+    if request.method == 'GET':
+        return render_template("imgprocess_home.html")
+
+    elif request.method == 'POST':
+        res=request.form
+        res_label=res.get('label')
+        print(res_label)
+        f = request.files['searchfilename']
+        file_name = "copy_of_" + f.filename
+        f.save(file_name)
+        res_search=search_object_api(file_name)
+        print(res_search)
+        if res_label == 'total':
+            # search_label_data=[]
+            # for i in res_search:
+            #     if i['label'] ==res_label:
+            #         search_label_data.append(i)
+            #     else:
+            #         pass
+            path = file_name
+            image = cv2.imread(path)
+            for i in res_search:
+                print(i)
+                start_point = (i['left'], int(i['top']))  # top,left
+                end_point = (i['width'] + i['left'], i['height'] + int(i['top']))
+                color = (255, 0, 0)
+                thickness = 2
+                cv2.rectangle(image, start_point, end_point, color, thickness)
+            cv2.imwrite('./static/result/out.jpg', image)
+            full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'out.jpg')
+            from collections import Counter
+            res = Counter(tok['label'] for tok in res_search)
+            return render_template("imgprocess_index.html",res_image=full_filename,result=dict(res))
+        else:
+            search_label_data=[]
+            for i in res_search:
+                if i['label'] ==res_label:
+                    search_label_data.append(i)
+                else:
+                    pass
+            path = file_name
+            image = cv2.imread(path)
+            for i in search_label_data:
+                print(i)
+                start_point = (i['left'], int(i['top']))  # top,left
+                end_point = (i['width'] + i['left'], i['height'] + int(i['top']))
+                color = (255, 0, 0)
+                thickness = 2
+                cv2.rectangle(image, start_point, end_point, color, thickness)
+            cv2.imwrite('./static/result/out.jpg', image)
+            full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'out.jpg')
+            from collections import Counter
+            res = Counter(tok['label'] for tok in search_label_data)
+            result=dict(res)
+            return render_template("imgprocess_index.html",res_image=full_filename,result=result)
 
 if __name__ == '__main__':
 

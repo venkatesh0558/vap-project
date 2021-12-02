@@ -1,16 +1,23 @@
-# This is a sample Python script.
+import cv2
+import requests
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+cap = cv2.VideoCapture('sample.mp4')
+def samplevideo():
+    list_data = []
+    while (cap.isOpened()):
+        ret, frame = cap.read()
+        if ret == True:
+            cv2.imshow('frame',frame)
+            files = {'image': open('accedent.jpg', 'rb')}
+            res = requests.post('http://182.75.117.230:8085/inference', files=files)
+            result = res.json()
+            list_data.append(result)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+        else:
+            cv2.destroyAllWindows()
+        cap.release()
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    return list_data
+res=samplevideo()
+print(res)

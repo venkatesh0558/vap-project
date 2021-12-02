@@ -1,12 +1,15 @@
 from pprint import pprint
 from pymediainfo import MediaInfo
+import json
+
 def metadatainfo(samplefile):
     samplefile_real=(str(samplefile))
     media_info = MediaInfo.parse(samplefile_real)
     res=[]
     for track in media_info.tracks:
         track = track.to_data()
-        res.append(track)
+        track_res=json.dumps(track,default=str)
+        res.append(track_res)
     return res
         # if track.track_type == "Video":
         #     print(track)
