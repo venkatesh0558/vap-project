@@ -36,7 +36,6 @@ def seach_object():
 
         in_json=request.json
         print(in_json)
-
         video_metadata=sample.video_metadata
         label = in_json['object_arr'][0]
         res = get_search_data(video_metadata, in_json,label)
