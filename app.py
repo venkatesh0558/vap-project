@@ -470,7 +470,7 @@ def imgprocess():
             full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'out.jpg')
             from collections import Counter
             res = Counter(tok['label'] for tok in res_search)
-            return render_template("imgprocess_index.html",res_image=full_filename,result=dict(res))
+            return render_template("imgprocess_index.html",res_image=full_filename,result=dict(res),search_label_data=res_search)
         else:
             search_label_data=[]
             for i in res_search:
@@ -492,7 +492,7 @@ def imgprocess():
             from collections import Counter
             res = Counter(tok['label'] for tok in search_label_data)
             result=dict(res)
-            return render_template("imgprocess_index.html",res_image=full_filename,result=result)
+            return render_template("imgprocess_index.html",res_image=full_filename,result=result,search_label_data=search_label_data)
 @app.route('/vdoprocess', methods=['GET','POST'])
 def vdoprocess():
     if request.method == 'GET':
