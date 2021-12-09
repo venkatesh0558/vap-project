@@ -1,20 +1,20 @@
 import cv2
-# path = 'sampletest.jpg'
-# image = cv2.imread(path)
-# i={
-#         "height": 199,
-#         "label": "person",
-#         "left": 384,
-#         "score": 0.34752,
-#         "top": 248.0,
-#         "width": 66
-#     }
-# start_point = (i['left'], int(i['top']))  # top,left
-# end_point = (i['width'] + i['left'], i['height'] + int(i['top']))
-# color = (255, 0, 0)
-# thickness = 2
-# cv2.rectangle(image, start_point, end_point, color, thickness)
-# cv2.imwrite('cord_out.jpeg',image)
+path = 'sampletest.jpg'
+image = cv2.imread(path)
+i={
+        "height": 199,
+        "label": "person",
+        "left": 384,
+        "score": 0.34752,
+        "top": 248.0,
+        "width": 66
+    }
+start_point = (i['left'], int(i['top']))  # top,left
+end_point = (i['width'] + i['left'], i['height'] + int(i['top']))
+color = (255, 0, 0)
+thickness = 2
+cv2.rectangle(image, start_point, end_point, color, thickness)
+cv2.imwrite('cord_out.jpeg',image)
 
 # from pymongo import MongoClient
 # import base64
